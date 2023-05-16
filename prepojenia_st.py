@@ -19,7 +19,7 @@ import ast
 
 
 @st.cache_data()
-def load_data(sheet_name):
+def load_data():
     """
     sheets_url = st.secrets["public_gsheets_url"]
     """
