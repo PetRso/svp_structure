@@ -81,10 +81,10 @@ for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
                             typy_temy = dfl.typ_standardu.dropna().unique().tolist()
                             if len(typy_temy) > 1:  # ma typy tem
                                 for typ_temy in typy_temy:
-                                    dfl = dfl[dfl.typ_standardu == typ_temy]
+                                    dftyp = dfl[dfl.typ_standardu == typ_temy]
                                     st.markdown('\n')
                                     st.markdown(f'##### {typ_temy}')
-                                    standardy_as_items_with_id(dfl["definicia_nova_po_korekture"])
+                                    standardy_as_items_with_id(dftyp["definicia_nova_po_korekture"])
                             else:
                                 standardy_as_items_with_id(dfl["definicia_nova_po_korekture"])
                 else:  # nemá témy
