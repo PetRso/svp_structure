@@ -67,7 +67,7 @@ for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
                 # obsahove standardy
                 dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-o-')]
                 # téma obsahového štandardu
-                temy = dfy.tema.unique().tolist()
+                temy = dfy.tema..dropna().unique().tolist()
                 # if len(temy) > 1:
                 #     tabs_temy = st.tabs(temy)
                 #     for tema, tab_tema in zip(temy, tabs_temy):
@@ -81,7 +81,7 @@ for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
                             typy_temy = dfl.typ_standardu.dropna().unique().tolist()
                             if len(typy_temy) > 1:  # ma typy tem
                                 for typ_temy in typy_temy:
-                                    dfl = dfy[dfy.typ_standardu == typ_temy]
+                                    dfl = dfl[dfl.typ_standardu == typ_temy]
                                     st.markdown('\n')
                                     st.markdown(f'##### {typ_temy}')
                                     standardy_as_items_with_id(dfl["definicia_nova_po_korekture"])
