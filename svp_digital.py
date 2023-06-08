@@ -67,7 +67,7 @@ for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
                 # obsahove standardy
                 dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-o-')]
                 # téma obsahového štandardu
-                temy = dfy.tema..dropna().unique().tolist()
+                temy = dfy.tema.dropna().unique().tolist()
                 # if len(temy) > 1:
                 #     tabs_temy = st.tabs(temy)
                 #     for tema, tab_tema in zip(temy, tabs_temy):
