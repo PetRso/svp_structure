@@ -36,7 +36,7 @@ df = load_standardy()
 # vyber predmet a cyklus
 # predmety = df.predmet.unique()
 cykly = [1, 2, 3]
-tabs_cykly = ['cyklus 1 (r.1-3)', 'cyklus 1 (r.4-6)', 'cyklus 3 (r.6-9)']
+tabs_cykly = ['cyklus 1 (r.1-3)', 'cyklus 2 (r.4-6)', 'cyklus 3 (r.6-9)']
 
 st.markdown('### Digitálny ŠVP')
 
@@ -63,6 +63,8 @@ for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
                     standardy_as_items_with_id(dfy["definicia_nova_po_korekture"])
                 with st.expander("Výkonový štandard"):
                     dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-v-')]
+                    if dfy.empty:
+                        dfy = dfx[dfx.index.str.contains('-v-')]
                     standardy_as_items_with_id(dfy["definicia_nova_po_korekture"])
                 # obsahove standardy
                 dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-o-')]
