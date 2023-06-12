@@ -1,5 +1,9 @@
 import streamlit as st
 import pandas as pd
+import ast
+from rapidfuzz import fuzz
+
+st.set_page_config(page_title="Digitálny ŠVP", page_icon=":school:")
 
 @st.cache_data()
 def load_standardy():
@@ -9,6 +13,7 @@ def load_standardy():
     sheets_url = st.secrets["public_gsheets_url"]  # existujú dva tvary
     csv_url = sheets_url.replace("edit?usp=sharing", f"gviz/tq?tqx=out:csv&sheet=vzdelavacie_standardy")
     df = pd.read_csv(csv_url).set_index('id')
+    df['definicia'] = df['definicia_nova_po_korekture']
     # df.index.str[:2].isin(['hu', 'de', 'ry', 'ri', 'ru', 'uk'])
     return df
 
@@ -16,9 +21,13 @@ def load_standardy():
 def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
     text = ''
-    for i, standard in standardy.items():
-        # text += f"- {standard} [{i}] \n"  # s id
-        text += f"- {standard}\n"
+    if len(standardy) == 1:
+        text = standardy.iloc[0]
+        text = text.capitalize() + '.'
+    else:
+        for i, standard in standardy.items():
+            # text += f"- {standard} [{i}] \n"  # s id
+            text += f"- {standard}\n"
     st.markdown(text)
 
 vos = {'Jazyk a komunikácia - prvý jazyk': ['Slovenský jazyk a literatúra', 'Maďarský jazyk a literatúra', 'Nemecký jazyk a literatúra', 'Rómsky jazyk a literatúra', 'Rusínsky jazyk a literatúra', 'Ruský jazyk a literatúra', 'Ukrajinský jazyk a literatúra'],
@@ -31,6 +40,8 @@ vos = {'Jazyk a komunikácia - prvý jazyk': ['Slovenský jazyk a literatúra', 
         'Umenie a kultúra': ['Hudobná výchova', 'Výtvarná výchova'],
         'Zdravie a pohyb': []}
 
+predmety_vykony_pod_cielmi = ['Človek a príroda', 'Informatika', 'Matematika', 'Človek a spoločnosť']
+
 df = load_standardy()
 
 # vyber predmet a cyklus
@@ -40,55 +51,83 @@ tabs_cykly = ['cyklus 1 (r.1-3)', 'cyklus 2 (r.4-5)', 'cyklus 3 (r.6-9)']
 
 st.markdown('### Digitálny ŠVP')
 
-vo = st.selectbox('Vzdelávacia oblasť', vos)
-if vos[vo]:
-    predmet = st.selectbox('Predmet', vos[vo])  # label_visibility='collapsed'
+query = st.text_input('Vyhľadávanie', '', key=1)
+
+if query:
+    df["res"] = [fuzz.token_set_ratio(t, query) for t in df.definicia]  # TODO use processes
+    df = df.sort_values("res", ascending=False)
+    st.write(df.loc[df.res > 50, ['predmet','definicia', 'typ', 'cyklus']])
 else:
-    predmet = vo
+    col1, col2 = st.columns(2)
+    with col1:
+        vo = st.selectbox('Vzdelávacia oblasť', vos)
+    with col2:
+        if vos[vo]:
+            predmet = st.selectbox('Predmet', vos[vo])  # label_visibility='collapsed'
+        else:
+            predmet = vo
 
-tabs_cykly = st.tabs(tabs_cykly)  # [f'cyklus {c}' for c in cykly]
+    if predmet in predmety_vykony_pod_cielmi:
+        ciele_a_vykony_su_nezavisle = True
+    else:
+        ciele_a_vykony_su_nezavisle = False
 
-# vyber ciele pre predmet a cyklus
-for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
-    with tab_cyklus:
-        dfx = df[(df.cyklus == cyklus) & (df.predmet == predmet)]
-        komponenty = dfx.komponent.dropna().unique().tolist()
+    tabs_cykly = st.tabs(tabs_cykly)  # [f'cyklus {c}' for c in cykly]
 
-        tabs_komponenty = st.tabs(komponenty)
+    # vyber ciele pre predmet a cyklus
+    for cyklus, tab_cyklus in zip(cykly, tabs_cykly):
+        with tab_cyklus:
+            st.markdown("\n")
 
-        for komponent, tab_komponent in zip(komponenty, tabs_komponenty):
-            with tab_komponent:
-                with st.expander("Ciele"):
-                    dfy = dfx[dfx.index.str.contains('-c-')]
-                    standardy_as_items_with_id(dfy["definicia_nova_po_korekture"])
-                with st.expander("Výkonový štandard"):
-                    dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-v-')]
-                    if dfy.empty:
-                        dfy = dfx[dfx.index.str.contains('-v-')]
-                    standardy_as_items_with_id(dfy["definicia_nova_po_korekture"])
-                # obsahove standardy
-                dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-o-')]
-                # téma obsahového štandardu
-                temy = dfy.tema.dropna().unique().tolist()
-                # if len(temy) > 1:
-                #     tabs_temy = st.tabs(temy)
-                #     for tema, tab_tema in zip(temy, tabs_temy):
-                #         with tab_tema:
-                #             dfl = dfy[dfy.tema == tema]
-                #             standardy_as_items_with_id(dfl["definicia_nova_po_korekture"])
-                if len(temy) > 1:
-                    for tema in temy:
-                        with st.expander(f'Obsahový štandard: {tema}'):
-                            dfl = dfy[dfy.tema == tema]
-                            typy_temy = dfl.typ_standardu.dropna().unique().tolist()
-                            if len(typy_temy) > 1:  # ma typy tem
-                                for typ_temy in typy_temy:
-                                    dftyp = dfl[dfl.typ_standardu == typ_temy]
-                                    st.markdown('\n')
-                                    st.markdown(f'##### {typ_temy}')
-                                    standardy_as_items_with_id(dftyp["definicia_nova_po_korekture"])
-                            else:
-                                standardy_as_items_with_id(dfl["definicia_nova_po_korekture"])
-                else:  # nemá témy
-                    with st.expander("Obsahový štandard"):
-                        standardy_as_items_with_id(dfy["definicia_nova_po_korekture"])
+            dfx = df[(df.cyklus == cyklus) & (df.predmet == predmet)]
+            komponenty = dfx.komponent.dropna().unique().tolist()
+
+            if ciele_a_vykony_su_nezavisle:
+                st.markdown("##### Ciele a výkonové štandardy")
+                ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0)
+                with st.expander(f"Výkonové štandardy k cieľu"):
+                    prepojenia = dfx.loc[dfx.definicia == ciel, "prepojenia"]
+                    prepojenie_vs = ast.literal_eval(prepojenia.iloc[0])
+                    standardy_as_items_with_id(dfx.loc[prepojenie_vs, "definicia"])
+
+                st.markdown("\n")
+                st.markdown("##### Obsahové štandardy pre komponenty")
+            else:
+                st.markdown("##### Komponenty")
+
+            tabs_komponenty = st.tabs(komponenty)
+
+            for komponent, tab_komponent in zip(komponenty, tabs_komponenty):
+                with tab_komponent:
+                    if not ciele_a_vykony_su_nezavisle:
+                        with st.expander("Ciele"):
+                            dfy = dfx[dfx.index.str.contains('-c-')]
+                            standardy_as_items_with_id(dfy["definicia"])
+                        with st.expander("Výkonový štandard"):
+                            dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-v-')]
+                            if dfy.empty:
+                                dfy = dfx[dfx.index.str.contains('-v-')]
+                            standardy_as_items_with_id(dfy["definicia"])
+                    # obsahove standardy
+                    dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-o-')]
+                    # téma obsahového štandardu
+                    temy = dfy.tema.dropna().unique().tolist()
+                    if len(temy) > 1:
+                        for tema in temy:
+                            with st.expander(f'Obsahový štandard: {tema}'):
+                                dfl = dfy[dfy.tema == tema]
+                                typy_temy = dfl.typ_standardu.dropna().unique().tolist()
+                                if len(typy_temy) > 1:  # ma typy tem
+                                    for typ_temy in typy_temy:
+                                        dftyp = dfl[dfl.typ_standardu == typ_temy]
+                                        st.markdown('\n')
+                                        st.markdown(f'###### {typ_temy}')
+                                        standardy_as_items_with_id(dftyp["definicia"])
+                                else:
+                                    standardy_as_items_with_id(dfl["definicia"])
+                    else:  # nemá témy
+                        if not ciele_a_vykony_su_nezavisle:
+                            with st.expander("Obsahový štandard", expanded=True):
+                                standardy_as_items_with_id(dfy["definicia"])
+                        else:
+                            standardy_as_items_with_id(dfy["definicia"])
