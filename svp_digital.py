@@ -56,7 +56,7 @@ query = st.text_input('Vyhľadávanie', '', key=1)
 if query:
     df["res"] = [fuzz.token_set_ratio(t, query) for t in df.definicia]  # TODO use processes
     df = df.sort_values("res", ascending=False)
-    st.write(df.loc[df.res > 50, ['predmet','definicia', 'typ', 'cyklus']])
+    st.dataframe(df.loc[df.res > 50, ['predmet','definicia', 'typ', 'cyklus']], use_container_width=True)
 else:
     col1, col2 = st.columns(2)
     with col1:
