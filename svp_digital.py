@@ -36,7 +36,7 @@ df = load_standardy()
 # vyber predmet a cyklus
 # predmety = df.predmet.unique()
 cykly = [1, 2, 3]
-tabs_cykly = ['cyklus 1 (r.1-3)', 'cyklus 2 (r.4-6)', 'cyklus 3 (r.6-9)']
+tabs_cykly = ['cyklus 1 (r.1-3)', 'cyklus 2 (r.4-5)', 'cyklus 3 (r.6-9)']
 
 st.markdown('### Digitálny ŠVP')
 
