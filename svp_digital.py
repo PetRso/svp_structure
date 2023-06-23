@@ -42,6 +42,7 @@ vos = {'Jazyk a komunikácia - prvý jazyk': ['Slovenský jazyk a literatúra', 
         'Zdravie a pohyb': []}
 
 predmety_vykony_pod_cielmi = ['Človek a príroda', 'Informatika', 'Matematika', 'Človek a spoločnosť']
+predmety_ciele_pod_komponentmi = ['Slovenský jazyk a literatúra']
 
 df = load_standardy()
 
@@ -83,9 +84,10 @@ else:
             dfx = df[(df.cyklus == cyklus) & (df.predmet == predmet)]
             komponenty = dfx.komponent.dropna().unique().tolist()
 
+            st.markdown("##### Ciele")
+            ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0)
+            
             if ciele_a_vykony_su_nezavisle:
-                st.markdown("##### Ciele a výkonové štandardy")
-                ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0)
                 with st.expander(f"Výkonové štandardy k cieľu"):
                     prepojenia = dfx.loc[dfx.definicia == ciel, "prepojenia"]
                     prepojenie_vs = ast.literal_eval(prepojenia.iloc[0])
