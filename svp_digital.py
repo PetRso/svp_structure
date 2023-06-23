@@ -85,7 +85,7 @@ else:
             komponenty = dfx.komponent.dropna().unique().tolist()
 
             st.markdown("##### Ciele")
-            ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0)
+            ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0, label_visibility='collapsed')
             
             if ciele_a_vykony_su_nezavisle:
                 with st.expander(f"Výkonové štandardy k cieľu"):
@@ -103,9 +103,9 @@ else:
             for komponent, tab_komponent in zip(komponenty, tabs_komponenty):
                 with tab_komponent:
                     if not ciele_a_vykony_su_nezavisle:
-                        with st.expander("Ciele"):
-                            dfy = dfx[dfx.index.str.contains('-c-')]
-                            standardy_as_items_with_id(dfy["definicia"])
+                        # with st.expander("Ciele"):
+                        #     dfy = dfx[dfx.index.str.contains('-c-')]
+                        #     standardy_as_items_with_id(dfy["definicia"])
                         with st.expander("Výkonový štandard"):
                             dfy = dfx[(dfx.komponent == komponent) & dfx.index.str.contains('-v-')]
                             if dfy.empty:
