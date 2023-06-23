@@ -126,7 +126,7 @@ else:
                                         st.markdown('\n')
                                         st.markdown(f'###### {typ_temy}')
                                         typy_standardov = dftyp.typ_standardu.unique().tolist()
-                                        if len(typy_standardov) > 1:
+                                        if len(typy_standardov) > 1:  # TOTO opaku je sa to
                                             for typ_standardu in typy_standardov:  # cinnost, pojem
                                                 st.markdown(f'####### {typ_standardu}')
                                                 standardy_as_items_with_id(dftyp.loc[dftyp.typ_standardu == typ_standardu, "definicia"])
@@ -143,6 +143,18 @@ else:
                     else:  # nemá témy
                         if not ciele_a_vykony_su_nezavisle:
                             with st.expander("Obsahový štandard", expanded=True):
-                                standardy_as_items_with_id(dfy["definicia"])
+                                typy_standardov = dfy.typ_standardu.unique().tolist()
+                                if len(typy_standardov) > 1:
+                                    for typ_standardu in typy_standardov:  # cinnost, pojem
+                                        st.markdown(f'####### {typ_standardu}')
+                                        standardy_as_items_with_id(dfy.loc[dfl.typ_standardu == typ_standardu, "definicia"])
+                                else:
+                                    standardy_as_items_with_id(dfy["definicia"])
                         else:
-                            standardy_as_items_with_id(dfy["definicia"])
+                            typy_standardov = dfy.typ_standardu.unique().tolist()
+                            if len(typy_standardov) > 1:
+                                for typ_standardu in typy_standardov:  # cinnost, pojem
+                                    st.markdown(f'####### {typ_standardu}')
+                                    standardy_as_items_with_id(dfy.loc[dfl.typ_standardu == typ_standardu, "definicia"])
+                            else:
+                                standardy_as_items_with_id(dfy["definicia"])
