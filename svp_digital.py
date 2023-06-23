@@ -53,7 +53,7 @@ tabs_cykly = ['cyklus 1 (r.1-3)', 'cyklus 2 (r.4-5)', 'cyklus 3 (r.6-9)']
 
 st.markdown('### Digitálny ŠVP')
 
-query = st.text_input('Vyhľadávanie', '', key=1)
+query = st.sidebar.text_input('Vyhľadávanie', '', key=1)
 
 if query:
     df["res"] = [fuzz.token_set_ratio(t, query) for t in df.definicia]  # TODO use processes
