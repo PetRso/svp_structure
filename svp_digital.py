@@ -125,9 +125,21 @@ else:
                                         dftyp = dfl[dfl.typ_standardu == typ_temy]
                                         st.markdown('\n')
                                         st.markdown(f'###### {typ_temy}')
-                                        standardy_as_items_with_id(dftyp["definicia"])
+                                        typy_standardov = dftyp.typ_standardu.unique().tolist()
+                                        if len(typy_standardov) > 1:
+                                            for typ_standardu in typy_standardov:  # cinnost, pojem
+                                                st.markdown(f'####### {typ_standardu}')
+                                                standardy_as_items_with_id(dftyp.loc[dftyp.typ_standardu == typ_standardu, "definicia"])
+                                        else:
+                                            standardy_as_items_with_id(dftyp["definicia"])
                                 else:
-                                    standardy_as_items_with_id(dfl["definicia"])
+                                    typy_standardov = dfl.typ_standardu.unique().tolist()
+                                    if len(typy_standardov) > 1:
+                                        for typ_standardu in typy_standardov:  # cinnost, pojem
+                                            st.markdown(f'####### {typ_standardu}')
+                                            standardy_as_items_with_id(dfl.loc[dfl.typ_standardu == typ_standardu, "definicia"])
+                                    else:
+                                        standardy_as_items_with_id(dftyp["definicia"])
                     else:  # nemá témy
                         if not ciele_a_vykony_su_nezavisle:
                             with st.expander("Obsahový štandard", expanded=True):
