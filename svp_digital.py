@@ -26,6 +26,8 @@ def standardy_as_items_with_id(standardy):
         if len(text) == 2:
             teyp = text[0].strip()
             text = text[1]  # definicie
+        else: 
+            text = text[0]  # aby nebol list
         text = text.split(';')
         text = [x.strip() for x in text]
         for txt in text:
