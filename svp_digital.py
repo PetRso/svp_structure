@@ -16,24 +16,28 @@ def load_standardy():
     df['definicia'] = df['definicia_nova_po_korekture']
     return df
 
+def format_definicia(text_orig):
+    """Funkcia ošetruje viac výkonov v jednom alebo vnorené komponenty."""
+    if ':' in text_orig:  # má definíciu napr. aktíva: ...
+        text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
+        typ = text_orig[0].strip()
+        text += f'####### {typ}'  # typ definicie
+        text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
+    text_orig = text_orig.split(';')   # viac standardov v jednom poly
+    text_orig = [x.strip() for x in text_orig]
+    for txt in text_orig:
+        text += f'- {txt}\n'  # .capitalize()
+    return text
 
 def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
     text = ''
     if len(standardy) == 1:  # jeden riadok         
         text_orig = standardy.iloc[0]
-        if ':' in text_orig:  # má definíciu
-            text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
-            typ = text_orig[0].strip()
-            text += f'####### {typ}'  # typ definicie
-            text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
-        text_orig = text_orig.split(';')
-        text_orig = [x.strip() for x in text_orig]
-        for txt in text_orig:
-            text += f'- {txt}\n'  # .capitalize()
+        text = format_definicia(text_orig)
     else:
         for i, text_orig in standardy.items():
-            text += f"- {text_orig}\n"
+            text += format_definicia(text_orig)
     st.markdown(text, unsafe_allow_html=True)
 
 def divide_by_typ_standardu(df):
