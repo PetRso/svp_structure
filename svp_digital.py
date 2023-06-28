@@ -22,7 +22,7 @@ def format_definicia(text_orig):
     if '::' in text_orig:  # má definíciu napr. aktíva: ...
         text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
         typ = text_orig[0].strip()
-        text += f'###### {typ}\n'  # typ definicie
+        text += f'###### {typ.capitalize()}\n'  # typ definicie
         text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
     text_orig = text_orig.split(';')   # viac standardov v jednom poly
     text_orig = [x.strip() for x in text_orig]
@@ -142,7 +142,7 @@ else:
     komponenty = dfx[dfx.index.str.contains('-o-')].komponent.dropna().unique().tolist()
 
     st.markdown(f'###  {predmet} - {cyklus}. cyklus')
-    st.markdown("##### Ciele")
+    st.markdown("#### Ciele")
     ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0,
                         label_visibility='collapsed')
 
@@ -154,7 +154,7 @@ else:
 
         st.markdown("\n")
 
-    st.markdown("##### Obsahové štandardy pre komponenty")
+    st.markdown("#### Obsahové štandardy pre komponenty")
 
     if (predmet == 'Človek a príroda') & (cyklus == 3):
         options = st.multiselect('Ktoré predmety ťa zaujímajú?',
