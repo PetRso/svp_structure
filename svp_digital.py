@@ -27,7 +27,7 @@ def format_definicia(text_orig):
     text_orig = text_orig.split(';')   # viac standardov v jednom poly
     text_orig = [x.strip() for x in text_orig]
     for txt in text_orig:
-        text += f'&nbsp;&nbsp;&nbsp;&nbsp; - {txt}\n'  # .capitalize()
+        text += f'- {txt}\n'  # .capitalize()
     return text
 
 def standardy_as_items_with_id(standardy):
