@@ -18,6 +18,7 @@ def load_standardy():
 
 def format_definicia(text_orig):
     """Funkcia ošetruje viac výkonov v jednom alebo vnorené komponenty."""
+    text = ''
     if ':' in text_orig:  # má definíciu napr. aktíva: ...
         text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
         typ = text_orig[0].strip()
@@ -31,7 +32,6 @@ def format_definicia(text_orig):
 
 def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
-    text = ''
     if len(standardy) == 1:  # jeden riadok         
         text_orig = standardy.iloc[0]
         text = format_definicia(text_orig)
