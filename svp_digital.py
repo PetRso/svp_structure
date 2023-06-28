@@ -19,7 +19,7 @@ def load_standardy():
 def format_definicia(text_orig):
     """Funkcia ošetruje viac výkonov v jednom alebo vnorené komponenty."""
     text = ''
-    if ':' in text_orig:  # má definíciu napr. aktíva: ...
+    if '::' in text_orig:  # má definíciu napr. aktíva: ...
         text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
         typ = text_orig[0].strip()
         text += f'###### {typ}\n'  # typ definicie
