@@ -22,7 +22,7 @@ def format_definicia(text_orig):
     if ':' in text_orig:  # má definíciu napr. aktíva: ...
         text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
         typ = text_orig[0].strip()
-        text += f'####### {typ}'  # typ definicie
+        text += f'###### {typ}\n'  # typ definicie
         text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
     text_orig = text_orig.split(';')   # viac standardov v jednom poly
     text_orig = [x.strip() for x in text_orig]
@@ -36,6 +36,7 @@ def standardy_as_items_with_id(standardy):
         text_orig = standardy.iloc[0]
         text = format_definicia(text_orig)
     else:
+        text = ''
         for i, text_orig in standardy.items():
             text += format_definicia(text_orig)
     st.markdown(text, unsafe_allow_html=True)
