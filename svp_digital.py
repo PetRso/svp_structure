@@ -20,14 +20,12 @@ def load_standardy():
 def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
     text = ''
-    if len(standardy) == 1:            
+    if len(standardy) == 1:  # jeden riadok         
         text = standardy.iloc[0]
-        text = text.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
-        if len(text) == 2:
-            teyp = text[0].strip()
-            text = text[1]  # definicie
-        else: 
-            text = text[0]  # aby nebol list
+        if ':' in text:  # má definíciu
+            text = text.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
+            typ = text[0].strip()
+            text = text[1]  # definicia # TODO test, existuje iba jedna :
         text = text.split(';')
         text = [x.strip() for x in text]
         for txt in text:
