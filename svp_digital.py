@@ -30,7 +30,7 @@ def standardy_as_items_with_id(standardy):
         text_orig = text_orig.split(';')
         text_orig = [x.strip() for x in text_orig]
         for txt in text_orig:
-            text += f'{txt[0].capitalize()}{txt[1:]}.'
+            text += f'- {txt}\n'  # .capitalize()
     else:
         for i, text_orig in standardy.items():
             text += f"- {text_orig}\n"
