@@ -22,12 +22,12 @@ def format_definicia(text_orig):
     if '::' in text_orig:  # má definíciu napr. aktíva: ...
         text_orig = text_orig.split('::')  # definicia ma v sebe typ napr. mat reprezentacie
         typ = text_orig[0].strip()
-        text += f'\n###### &nbsp;&nbsp;&nbsp;&nbsp;{typ.capitalize()}'  # typ definicie
+        text += f'###### &nbsp;&nbsp;&nbsp;&nbsp;{typ.capitalize()}\n'  # typ definicie
         text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
     text_orig = text_orig.split(';')   # viac standardov v jednom poly
     text_orig = [x.strip() for x in text_orig]
     for txt in text_orig:
-        text += f'- {txt}\n'  # .capitalize()
+        text += f'&nbsp;&nbsp;&nbsp;&nbsp; - {txt}\n'  # .capitalize()
     return text
 
 def standardy_as_items_with_id(standardy):
