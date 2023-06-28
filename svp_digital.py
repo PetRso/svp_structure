@@ -45,7 +45,7 @@ def divide_by_typ_standardu(df):
     typy_standardov = df.typ_standardu.dropna().unique().tolist()
     if (len(typy_standardov) > 0):
         for typ_standardu in typy_standardov:  # cinnost, pojem
-            st.markdown(f'###### {typ_standardu}')
+            st.markdown(f'##### {typ_standardu}')
             standardy_as_items_with_id(
                 df.loc[df.typ_standardu == typ_standardu, "definicia"])
     else:
