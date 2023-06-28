@@ -21,18 +21,19 @@ def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
     text = ''
     if len(standardy) == 1:  # jeden riadok         
-        text = standardy.iloc[0]
-        if ':' in text:  # má definíciu
-            text = text.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
-            typ = text[0].strip()
-            text = text[1]  # definicia # TODO test, existuje iba jedna :
-        text = text.split(';')
-        text = [x.strip() for x in text]
-        for txt in text:
-            text += f'{text[0].capitalize()}{text[1:]}.'
+        text_orig = standardy.iloc[0]
+        if ':' in text_orig:  # má definíciu
+            text_orig = text_orig.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
+            typ = text_orig[0].strip()
+            text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
+        text_orig = text_orig.split(';')
+        text_orig = [x.strip() for x in text_orig]
+        text += f'####### {typ}'
+        for txt in text_orig:
+            text += f'{txt[0].capitalize()}{txt[1:]}.'
     else:
-        for i, standard in standardy.items():
-            text += f"- {standard}\n"
+        for i, text_orig in standardy.items():
+            text += f"- {text_orig}\n"
     st.markdown(text, unsafe_allow_html=True)
 
 def divide_by_typ_standardu(df):
