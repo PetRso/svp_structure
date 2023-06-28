@@ -110,13 +110,18 @@ else:
         tabs_cykly = {'Komunikačná úroveň 1 (základná)':1, 'Komunikačná úroveň 2 (rozširujúca)': 2}
     elif predmet == 'Cudzí jazyk':
         tabs_cykly = {'cyklus 1 (r.1-3)': 1, 'cyklus 2 (r.4-5)': 2, 'cyklus 3 - prvý jazyk (r.6-9)': 3, 'cyklus 3 - druhý jazyk (r.6-9)': 4}
-
+        jazyky = ['Anglický jazyk', 'Francúzsky jazyk', 'Nemecký jazyk', 'Ruský jazyk', 'Španielsky jazyk', 'Taliansky jazyk']
+        jazyk = st.sidebar.selectbox('Jazyk', jazyky)
+        jazyky.remove(jazyk)  # iba jazyky, ktore nechcem
+    
     cyklus = tabs_cykly[st.sidebar.selectbox('Cyklus', tabs_cykly.keys())]
 
     # výber dát
     idx = df.index.str.contains(f'{predmety_kody[predmet]}{cyklus}')
     dfx = df[idx]  # (df.cyklus == cyklus) & (df.predmet == predmet)]
-
+    if predmet == 'Cudzí jazyk':
+        dfx=dfx[~dfx.typ_standardu.isin(jazyky)]  # iba pre vybraný jazyk, alebo pre všetky
+    
     hlavny_ciel = dfx.loc[dfx.index.str.contains('-hc-'),"definicia"]
     if not hlavny_ciel.empty:
         st.sidebar.info(hlavny_ciel[0])
