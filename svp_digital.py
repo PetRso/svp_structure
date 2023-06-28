@@ -20,9 +20,16 @@ def load_standardy():
 def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
     text = ''
-    if len(standardy) == 1:
+    if len(standardy) == 1:            
         text = standardy.iloc[0]
-        text = text[0].capitalize() + text[1:] + '.'
+        text = text.split(':')  # definicia ma v sebe typ napr. mat reprezentacie
+        if len(text) == 2:
+            teyp = text[0].strip()
+            text = text[1]  # definicie
+        text = text.split(';')
+        text = [x.strip() for x in text]
+        for txt in text:
+            text += f'{text[0].capitalize()}{text[1:]}.'
     else:
         for i, standard in standardy.items():
             text += f"- {standard}\n"
