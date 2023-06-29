@@ -2,29 +2,8 @@ import streamlit as st
 import pandas as pd
 import ast
 from rapidfuzz import fuzz
-from google.oauth2 import service_account
-from gsheetsdb import connect
 
 st.set_page_config(page_title="Digitálny ŠVP", page_icon=":school:")
-
-# Create a connection object.
-credentials = service_account.Credentials.from_service_account_info(
-    st.secrets["gcp_service_account"],
-    scopes=[
-        "https://www.googleapis.com/auth/spreadsheets",
-    ],
-)
-conn = connect(credentials=credentials)
-
-# Perform SQL query on the Google Sheet.
-@st.cache_resource(ttl=600)
-def run_query(query):
-    rows = conn.execute(query, headers=1)
-    rows = rows.fetchall()
-    return rows
-
-sheet_url = st.secrets["privat_gsheets_url"]
-conn.insert_row(["aa","bbx"], 3)
 
 @st.cache_data()
 def load_standardy():
