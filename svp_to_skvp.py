@@ -142,7 +142,7 @@ cols_to_xlsx = ['typ', 'komponent', 'tema', 'typ_standardu']
 cols_to_st = ['definicia', '1', '2', '3']
 
 st.info('Označ, ktoré obsahové štandardy sa majú preberať v ktorom ročníku.')
-st.data_editor(dfx[cols_to_st], hide_index=True)
+dfx_edited = st.data_editor(dfx[cols_to_st], hide_index=True, key="data_editor")
 
 def to_excel(df):
     output = BytesIO()
@@ -157,7 +157,7 @@ def to_excel(df):
     return processed_data
 
 col_not = ['prepojenie_prierez', 'prepojenia', 'prepojenia ciel na ciel']
-df_xlsx = to_excel(dfx[cols_to_xlsx + cols_to_st])
+df_xlsx = to_excel(pd.concat([dfx[cols_to_xlsx], dfx_edited], axis=1))
 st.download_button(label='📥 Download',
                    data=df_xlsx ,
                    file_name= 'rozdelene_standardy.xlsx')
