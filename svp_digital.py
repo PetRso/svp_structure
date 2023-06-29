@@ -24,7 +24,7 @@ def run_query(query):
     return rows
 
 sheet_url = st.secrets["privat_gsheets_url"]
-rows = run_query(f'INSERT INTO "{sheet_url}" ("name", "pet") VALUES ("aa","bb")')
+conn.insert_row(["aa","bbx"], 3)
 
 @st.cache_data()
 def load_standardy():
