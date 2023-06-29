@@ -136,12 +136,12 @@ else:
         dfx=dfx[~dfx.typ_standardu.isin(jazyky)]  # iba pre vybraný jazyk, alebo pre všetky
     
     hlavny_ciel = dfx.loc[dfx.index.str.contains('-hc-'),"definicia"]
-    if not hlavny_ciel.empty:
-        st.info(hlavny_ciel[0])
 
     komponenty = dfx[dfx.index.str.contains('-o-')].komponent.dropna().unique().tolist()
 
     st.markdown(f'###  {predmet} - {cyklus}. cyklus')
+    if not hlavny_ciel.empty:
+        st.info(hlavny_ciel[0])
     st.markdown("#### Ciele")
     ciel = st.selectbox('Cieľ', dfx.loc[dfx.index.str.contains("-c-"), "definicia"], index=0,
                         label_visibility='collapsed')
