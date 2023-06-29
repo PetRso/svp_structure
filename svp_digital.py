@@ -137,7 +137,7 @@ else:
     
     hlavny_ciel = dfx.loc[dfx.index.str.contains('-hc-'),"definicia"]
     if not hlavny_ciel.empty:
-        st.sidebar.info(hlavny_ciel[0])
+        st.info(hlavny_ciel[0])
 
     komponenty = dfx[dfx.index.str.contains('-o-')].komponent.dropna().unique().tolist()
 
