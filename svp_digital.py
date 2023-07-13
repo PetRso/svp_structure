@@ -3,7 +3,34 @@ import pandas as pd
 import ast
 from rapidfuzz import fuzz
 
-st.set_page_config(page_title="Digitálny ŠVP", page_icon=":school:")
+st.set_page_config(page_title="Digitálny ŠVP", page_icon=":ledger:")
+
+prierez_gram = {'Vizuálna gramotnosť': ':eye:',
+                'Čitateľská gramotnosť': ':book:',
+                'Digitálna gramotnosť': ':computer:',
+                'Finančná gramotnosť': ':chart_with_upwards_trend:',
+                'Občianska gramotnosť': ':woman-raising-hand:',
+                'Mediálna gramotnosť': ':iphone:',
+                'Interkultúrna gramotnosť': ':earth_africa:',  # handshake
+                'Environmentálna gramotnosť': ':seedling:',  # or :evergreen_tree:
+                'Sociálna a emocionálna gramotnosť': ':people_holding_hands:'}
+
+
+def add_prierezove_gramotnosti(df):
+    """Vloží za definíciu ikonku s emoji pre prierezovu gramotnost"""
+    i_type = df.index.str.contains('-o-') | df.index.str.contains('-v-')  # nie v cieloch
+    df["definicia"] = df["definicia"] + ' '  # vlozi vsade medzeru
+    for gramotnost in prierez_gram.keys():
+        i = (~df[gramotnost].isna()) & i_type
+        df.loc[i, "definicia"] = df.loc[i, "definicia"] + f"<span title='{gramotnost}'>{prierez_gram[gramotnost]}</span> "
+    return df
+
+
+def vloz_id(df):
+    """Vloží za definíciu ikonku s emoji pre prierezovu gramotnost"""
+    i = df.index.str.contains('-o-') | df.index.str.contains('-v-')  # nie v cieloch
+    df.loc[i,"definicia"] = "<span title='" + df.loc[i].index + "'>" + df.loc[i].definicia + "</span> "
+    return df
 
 @st.cache_data()
 def load_standardy():
@@ -14,7 +41,9 @@ def load_standardy():
     csv_url = sheets_url.replace("edit?usp=sharing", f"gviz/tq?tqx=out:csv&sheet=vzdelavacie_standardy")
     df = pd.read_csv(csv_url).set_index('id')
     df['definicia'] = df['definicia_nova_po_korekture']
+    df = add_prierezove_gramotnosti(df)
     return df
+
 
 def format_definicia(text_orig):
     """Funkcia ošetruje viac výkonov v jednom alebo vnorené komponenty."""
@@ -24,15 +53,16 @@ def format_definicia(text_orig):
         typ = text_orig[0].strip()
         text += f'###### &nbsp;&nbsp;&nbsp;&nbsp;{typ.capitalize()}\n'  # typ definicie
         text_orig = text_orig[1]  # definicia # TODO test, existuje iba jedna :
-    text_orig = text_orig.split(';')   # viac standardov v jednom poly
+    text_orig = text_orig.split(';')  # viac standardov v jednom poly
     text_orig = [x.strip() for x in text_orig]
     for txt in text_orig:
         text += f'- {txt}\n'  # .capitalize()
     return text
 
+
 def standardy_as_items_with_id(standardy):
     """Zobrazí štandardy ako odrážky."""
-    if len(standardy) == 1:  # jeden riadok         
+    if len(standardy) == 1:  # jeden riadok
         text_orig = standardy.iloc[0]
         text = format_definicia(text_orig)
     else:
@@ -41,7 +71,9 @@ def standardy_as_items_with_id(standardy):
             text += format_definicia(text_orig)
     st.markdown(text, unsafe_allow_html=True)
 
+
 def divide_by_typ_standardu(df):
+    df = vloz_id(df)
     typy_standardov = df.typ_standardu.dropna().unique().tolist()
     if (len(typy_standardov) > 0):
         for typ_standardu in typy_standardov:  # cinnost, pojem
@@ -51,14 +83,13 @@ def divide_by_typ_standardu(df):
     else:
         standardy_as_items_with_id(df["definicia"])
 
+
 # definícia predmetov
-vos = {'Jazyk a komunikácia - prvý jazyk': ['Slovenský jazyk a literatúra', 'Maďarský jazyk a literatúra',
-                                            'Nemecký jazyk a literatúra', 'Rómsky jazyk a literatúra',
-                                            'Rusínsky jazyk a literatúra', 'Ruský jazyk a literatúra',
-                                            'Ukrajinský jazyk a literatúra'],
-       'Jazyk a komunikácia - druhý jazyk': ['Slovenský jazyk a slovenská literatúra',
-                                            'Slovenský jazyk ako druhý jazyk'],
-       'Jazyk a komunikácia - cudzí jazyk': ['Cudzí jazyk'],
+vos = {'Jazyk a komunikácia': ['Slovenský jazyk a literatúra', 'Cudzí jazyk', 'Maďarský jazyk a literatúra',
+                                'Nemecký jazyk a literatúra', 'Rómsky jazyk a literatúra',
+                                'Rusínsky jazyk a literatúra', 'Ruský jazyk a literatúra',
+                                'Ukrajinský jazyk a literatúra', 'Slovenský jazyk a slovenská literatúra',
+                                'Slovenský jazyk ako druhý jazyk'],
        'Matematika a informatika': ['Matematika', 'Informatika'],
        'Človek a príroda': [],
        'Človek a spoločnosť': ['Človek a spoločnosť', 'Náboženstvo Cirkvi bratskej',
@@ -71,23 +102,23 @@ vos = {'Jazyk a komunikácia - prvý jazyk': ['Slovenský jazyk a literatúra', 
 
 # definícia skratiek pre id
 predmety_kody = {'Slovenský jazyk a literatúra': 'sk',
-    'Maďarský jazyk a literatúra':'hu',
-    'Nemecký jazyk a literatúra':'de',
-    'Rómsky jazyk a literatúra':'ry',
-    'Rusínsky jazyk a literatúra':'ri',
-    'Ruský jazyk a literatúra':'ru',
-    'Ukrajinský jazyk a literatúra':'uk',
-    'Slovenský jazyk a slovenská literatúra':'sj',
-    'Slovenský jazyk ako druhý jazyk':'dj',
-    'Cudzí jazyk':'cj',
-    'Matematika':'mt',
-    'Informatika':'if',
-    'Človek a spoločnosť':'cs',
-    'Človek a príroda': 'cp',
-    'Človek a svet práce': 'sp',
-    'Hudobná výchova':'hv',
-    'Výtvarná výchova':'vv',
-    'Zdravie a pohyb': 'zp'}
+                 'Maďarský jazyk a literatúra': 'hu',
+                 'Nemecký jazyk a literatúra': 'de',
+                 'Rómsky jazyk a literatúra': 'ry',
+                 'Rusínsky jazyk a literatúra': 'ri',
+                 'Ruský jazyk a literatúra': 'ru',
+                 'Ukrajinský jazyk a literatúra': 'uk',
+                 'Slovenský jazyk a slovenská literatúra': 'sj',
+                 'Slovenský jazyk ako druhý jazyk': 'dj',
+                 'Cudzí jazyk': 'cj',
+                 'Matematika': 'mt',
+                 'Informatika': 'if',
+                 'Človek a spoločnosť': 'cs',
+                 'Človek a príroda': 'cp',
+                 'Človek a svet práce': 'sp',
+                 'Hudobná výchova': 'hv',
+                 'Výtvarná výchova': 'vv',
+                 'Zdravie a pohyb': 'zp'}
 
 predmety_vykony_pod_cielmi = ['Človek a príroda', 'Informatika', 'Matematika', 'Človek a spoločnosť']
 predmety_ciele_pod_komponentmi = ['Slovenský jazyk a literatúra']
@@ -97,16 +128,25 @@ df = load_standardy()
 # vyber predmet a cyklus
 # predmety = df.predmet.unique()
 cykly = [1, 2, 3]
-tabs_cykly = {'cyklus 1 (r.1-3)': 1, 'cyklus 2 (r.4-5)':2, 'cyklus 3 (r.6-9)':3}
+tabs_cykly = {'cyklus 1 (r.1-3)': 1, 'cyklus 2 (r.4-5)': 2, 'cyklus 3 (r.6-9)': 3}
 
 st.sidebar.markdown('# Digitálny ŠVP')
 
 query = st.sidebar.text_input('Vyhľadávanie', '', key=1)
 
 if query:
-    df["res"] = [fuzz.token_set_ratio(t, query) for t in df.definicia]  # TODO use processes
-    df = df.sort_values("res", ascending=False)
-    st.dataframe(df.loc[df.res > 50, ['predmet', 'definicia', 'typ', 'cyklus']], use_container_width=True)
+    if len(query) < 3:
+        st.sidebar.warning('Hľadaný text musí mať aspoň 3 znaky')
+    else:
+        df["res"] = [fuzz.token_set_ratio(t, query) for t in df.definicia]  # TODO use processes
+        df = df.sort_values("res", ascending=False)
+        df = df.loc[df.res > 50]
+        st.sidebar.info(f'Našlo sa {len(df)} podobných záznamov')
+        st.sidebar.info(f'Pre návrat na ŠVP zmažte text vo vyhľadávaní.')
+
+        for id, row in df.iterrows():
+            st.markdown(f"<span title='{row.predmet}, {row.cyklus}. cyklus, {row.typ}, {id}'>{row.definicia}</span> ",
+                        unsafe_allow_html=True)
 else:
     vo = st.sidebar.selectbox('Vzdelávacia oblasť', vos)
     if vos[vo]:
@@ -119,23 +159,26 @@ else:
     else:
         ciele_a_vykony_su_nezavisle = False
 
+    # špecifiká predmetov
     if predmet == 'Slovenský jazyk ako druhý jazyk':
-        tabs_cykly = {'Komunikačná úroveň 1 (základná)':1, 'Komunikačná úroveň 2 (rozširujúca)': 2}
+        tabs_cykly = {'Komunikačná úroveň 1 (základná)': 1, 'Komunikačná úroveň 2 (rozširujúca)': 2}
     elif predmet == 'Cudzí jazyk':
-        tabs_cykly = {'cyklus 1 (r.1-3)': 1, 'cyklus 2 (r.4-5)': 2, 'cyklus 3 - prvý jazyk (r.6-9)': 3, 'cyklus 3 - druhý jazyk (r.6-9)': 4}
-        jazyky = ['Anglický jazyk', 'Francúzsky jazyk', 'Nemecký jazyk', 'Ruský jazyk', 'Španielsky jazyk', 'Taliansky jazyk']
+        tabs_cykly = {'cyklus 1 (r.1-3)': 1, 'cyklus 2 (r.4-5)': 2, 'cyklus 3 - prvý jazyk (r.6-9)': 3,
+                      'cyklus 3 - druhý jazyk (r.6-9)': 4}
+        jazyky = ['Anglický jazyk', 'Francúzsky jazyk', 'Nemecký jazyk', 'Ruský jazyk', 'Španielsky jazyk',
+                  'Taliansky jazyk']
         jazyk = st.sidebar.selectbox('Jazyk', jazyky)
         jazyky.remove(jazyk)  # iba jazyky, ktore nechcem
-    
+
     cyklus = tabs_cykly[st.sidebar.selectbox('Cyklus', tabs_cykly.keys())]
 
     # výber dát
     idx = df.index.str.contains(f'{predmety_kody[predmet]}{cyklus}')
     dfx = df[idx]  # (df.cyklus == cyklus) & (df.predmet == predmet)]
     if predmet == 'Cudzí jazyk':
-        dfx=dfx[~dfx.typ_standardu.isin(jazyky)]  # iba pre vybraný jazyk, alebo pre všetky
-    
-    hlavny_ciel = dfx.loc[dfx.index.str.contains('-hc-'),"definicia"]
+        dfx = dfx[~dfx.typ_standardu.isin(jazyky)]  # iba pre vybraný jazyk, alebo pre všetky
+
+    hlavny_ciel = dfx.loc[dfx.index.str.contains('-hc-'), "definicia"]
 
     komponenty = dfx[dfx.index.str.contains('-o-')].komponent.dropna().unique().tolist()
 
@@ -150,6 +193,7 @@ else:
         with st.expander(f"Výkonové štandardy k cieľu"):
             prepojenia = dfx.loc[dfx.definicia == ciel, "prepojenia"]
             prepojenie_vs = ast.literal_eval(prepojenia.iloc[0])
+            dfx = vloz_id(dfx)
             standardy_as_items_with_id(dfx.loc[prepojenie_vs, "definicia"])
 
         st.markdown("\n")
@@ -158,8 +202,8 @@ else:
 
     if (predmet == 'Človek a príroda') & (cyklus == 3):
         options = st.multiselect('Ktoré predmety ťa zaujímajú?',
-                             ['Fyzika', 'Chémia', 'Biológia'],
-                             ['Fyzika', 'Chémia', 'Biológia'])
+                                 ['Fyzika', 'Chémia', 'Biológia'],
+                                 ['Fyzika', 'Chémia', 'Biológia'])
 
         if 'Chémia' in options:
             i_ch = dfx.definicia.str.contains('<sup>CH</sup>')
@@ -202,7 +246,7 @@ else:
                         divide_by_typ_standardu(dfl)
             else:  # nemá témy
                 if not ciele_a_vykony_su_nezavisle:
-                    with st.expander("Obsahový štandard", expanded=True):
+                    with st.expander("Obsahový štandard"):
                         divide_by_typ_standardu(dfy)
                 else:
                     divide_by_typ_standardu(dfy)
